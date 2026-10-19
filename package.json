@@ -1,0 +1,43 @@
+{
+  "name": "kalkulacka",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "serve out -l 3000",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IvanaK88/Kalkulacka.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/IvanaK88/Kalkulacka/issues"
+  },
+  "homepage": "https://github.com/IvanaK88/Kalkulacka#readme",
+  "dependencies": {
+    "@date-fns/utc": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "prettier": "^3.9.10",
+    "serve": "^14.2.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

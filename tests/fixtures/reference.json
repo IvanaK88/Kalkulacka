@@ -1,0 +1,10 @@
+[
+  { "date": "2026-09-24", "text": "Převzetí zásilky do přepravy." },
+  { "date": "2026-09-25", "text": "Doručování zásilky." },
+  { "date": "2026-09-25", "text": "Uložení zásilky – adresát nezastižen." },
+  {
+    "date": "2026-10-15",
+    "text": "Odeslání zásilky zpět odesílateli – adresát zásilku nevyzvedl ve stanovené odběrní lhůtě."
+  },
+  { "date": "2026-10-16", "text": "Vrácení zásilky odesílateli." }
+]
