@@ -7,15 +7,15 @@ Statický český web pro počítač s ručním zadáním **data prvního pokusu
 ## Jak počítá
 
 - Zadaný první pokus je den 0. Následující den je den 1; předpokládané doručení je den 0 + 15 kalendářních dnů.
-- Standardní model konec neposouvá. Je-li den 15 nepracovní, web samostatně ukáže variantu posunu na následující pracovní den. Tu lze výslovně zapnout v rozbalovacích podmínkách.
-- **První pokus nemusí být skutečným právním počátkem úložní lhůty.** Jde o model podle uživatelem zadaného předpokladu, nikoli o ověřené doručení. Použití posunu dle § 607 OZ je nutné odborně ověřit.
+- Je-li den 15 sobota, neděle nebo český svátek, konec úložní lhůty a fikce doručení se **automaticky posunou na nejbližší následující pracovní den** podle § 607 občanského zákoníku. Posun nelze vypnout.
+- **První pokus nemusí být skutečným právním počátkem úložní lhůty.** Jde o model podle uživatelem zadaného předpokladu, nikoli o ověřené doručení. Patnáctidenní fikce vychází z § 336 zákoníku práce; občanský zákoník upravuje počítání konce lhůty.
 - DPP/DPČ: výpovědní doba 15 dnů zahrnuje den doručení, tedy konec = doručení + 14 dnů. Její konec se neposouvá kvůli svátku ani víkendu.
 - HPP: výpověď rozlišuje režim před a od 1. 6. 2025. Délku zadává uživatel; ochranné doby a smluvní okolnosti musí posoudit samostatně.
-- Odlišná smluvní pravidla zablokují automatické určení konce. Zrušení vyžaduje potvrzení zákonných předpokladů.
+- Rozhraní nemá volbu jiných smluvních pravidel; používá zákonný standard. Zrušení vyžaduje potvrzení zákonných předpokladů. Individuální odchylky se posuzují samostatně.
 - Model je určen pro nevyzvednutou zásilku, nikoliv pro skutečné převzetí či odmítnutí.
 - Podporované zadání: 1. 10. 2023 až 31. 12. 2099. Budoucí změny práva nejsou automaticky aktualizovány. Kalendář obsahuje české svátky a Velikonoce; data jsou civilní dny v kontextu Europe/Prague.
 
-Aktuální právní znění a judikatura nebyly online ověřeny: oficiální zdroje při předchozí kontrole blokovala síťová proxy (403). Výsledek je vždy **předběžný**; potvrzení podmínek z něj nedělá právní stanovisko.
+Právní podklady byly znovu prověřeny 19. 10. 2026 v dostupném oficiálním textu MPSV. Přesný rozsah ověření, odkazy na ustanovení a omezení přístupu k e-Sbírce popisují [právní podklady](docs/pravni-podklady.md). Výsledek je vždy **předběžný**; potvrzení podmínek z něj nedělá právní stanovisko.
 
 ## Spuštění a sestavení
 
@@ -52,7 +52,7 @@ npm run build
 npm run test:e2e
 ```
 
-Jednotkové testy zahrnují den 0, den 15, volitelný posun, DPP/DPČ, HPP, víkendy a svátky, přestupnost i neplatná data. Browserové testy ověřují skutečný statický export, odkaz na poštu, výpočet, přepočet po změně, reset, mobilní rozložení a absenci volání API.
+Jednotkové testy zahrnují den 0, den 15, automatický posun přes nepracovní dny, DPP/DPČ, HPP, víkendy a svátky, přestupnost i neplatná data. Browserové testy ověřují skutečný statický export, odkaz na poštu, výpočet, přepočet po změně, reset, mobilní rozložení a absenci volání API.
 
 Browserové testy spustí vlastní statický server na portu 3001. Vyžadují systémový Chromium na `/usr/bin/chromium` nebo proměnnou `CHROMIUM_PATH`. `npm run typecheck` spusťte po prvním sestavení, které připraví generované typy Next.js.
 

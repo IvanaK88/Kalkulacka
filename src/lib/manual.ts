@@ -1,3 +1,4 @@
+import { differenceInCalendarDays } from "date-fns";
 import { calculate, type Input } from "./legal";
 import { date, plus, nextWorking, display } from "./calendar";
 export type ManualInput = Pick<
@@ -5,10 +6,9 @@ export type ManualInput = Pick<
   | "relationship"
   | "termination"
   | "noticeMonths"
-  | "custom"
   | "checks"
   | "immediateAllowed"
-> & { dayZero: string; shift: boolean };
+> & { dayZero: string };
 export function calculateManual(input: ManualInput) {
   date(input.dayZero);
   if (input.dayZero > "2099-12-31")
@@ -20,13 +20,14 @@ export function calculateManual(input: ManualInput) {
   const r = calculate({
     ...input,
     available: input.dayZero,
-    storageShift: input.shift ? "working" : "calendar",
   });
   const day15 = plus(input.dayZero, 15);
   return {
     ...r,
     day15,
-    alternative: nextWorking(day15),
+    shifted: nextWorking(day15) !== day15,
+    countedDays:
+      differenceInCalendarDays(date(r.deadline!), date(input.dayZero)) + 1,
     steps: [
       `Den 0: ${display(input.dayZero)} — vámi zadaný první pokus o doručení. Pro tento model je zároveň předpokládaným počátkem lhůty.`,
       `Den 1: ${display(plus(input.dayZero, 1))}. Den 15: ${display(day15)}. Počítá se 15 kalendářních dnů; den 0 se nezapočítává, vnitřní víkendy a svátky ano.`,

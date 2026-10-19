@@ -350,15 +350,6 @@ summary:focus-visible {
 .advanced[open] summary {
   margin-bottom: 15px;
 }
-.shift {
-  border-top: 1px solid var(--border);
-  margin-top: 16px;
-  padding-top: 5px;
-}
-.shift small {
-  font-size: 10px;
-  color: var(--muted);
-}
 .calculate {
   width: 100%;
   display: flex;
@@ -525,7 +516,7 @@ summary:focus-visible {
 .resultdates strong {
   font-weight: 600;
 }
-.alternative {
+.deadline-shift {
   margin: 0 27px 17px;
   background: #fff8e6;
   border-radius: 7px;

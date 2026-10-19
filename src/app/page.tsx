@@ -15,10 +15,8 @@ export default function Page() {
     relationship: "HPP",
     termination: "delivery",
     noticeMonths: 2,
-    custom: false,
     checks: [false, false, false, false, false],
     immediateAllowed: false,
-    shift: false,
   });
   const [submitted, setSubmitted] = useState(false);
   function update(p: Partial<ManualInput>) {
@@ -129,7 +127,6 @@ export default function Page() {
                     update({
                       relationship: r,
                       termination: "delivery",
-                      custom: false,
                       immediateAllowed: false,
                     })
                   }
@@ -187,16 +184,6 @@ export default function Page() {
                 </p>
               </div>
             )}
-            {input.termination !== "delivery" && (
-              <label className="check">
-                <input
-                  type="checkbox"
-                  checked={input.custom}
-                  onChange={(e) => update({ custom: e.target.checked })}
-                />
-                Ve smlouvě nebo dohodě jsou sjednána jiná pravidla skončení.
-              </label>
-            )}
             {["trial", "immediate"].includes(input.termination) && (
               <label className="check">
                 <input
@@ -211,7 +198,7 @@ export default function Page() {
               </label>
             )}
             <details className="advanced">
-              <summary>Podmínky doručování a způsob počítání</summary>
+              <summary>Podmínky doručování</summary>
               <p className="fieldhint">
                 Samotný první pokus tyto skutečnosti neprokazuje.
               </p>
@@ -231,20 +218,6 @@ export default function Page() {
                   {s}
                 </label>
               ))}
-              <div className="shift">
-                <label className="check">
-                  <input
-                    type="checkbox"
-                    checked={input.shift}
-                    onChange={(e) => update({ shift: e.target.checked })}
-                  />
-                  Použít variantu posunu konce úložní lhůty na pracovní den.
-                </label>
-                <small>
-                  Použitelnost § 607 OZ vyžaduje odborné posouzení. Výpovědní
-                  doba se tímto neposouvá.
-                </small>
-              </div>
             </details>
             {error && (
               <div className="error" role="alert">
@@ -255,7 +228,7 @@ export default function Page() {
               Vypočítat termíny <span>→</span>
             </button>
             <p className="belowbutton">
-              15 kalendářních dnů · Den zadání = den 0
+              15 kalendářních dnů · Nepracovní konec lhůty posouváme
             </p>
           </form>
           <section className="card result" aria-live="polite">
@@ -304,7 +277,7 @@ export default function Page() {
                       ? "Model fikce doručení při nevyzvednutí zásilky"
                       : result.end
                         ? "Podmíněno řádným doručením a platností skončení"
-                        : "Zkontrolujte podmínky a případná smluvní pravidla"}
+                        : "Zkontrolujte zákonné podmínky skončení"}
                   </p>
                 </div>
                 <div className="resultdates">
@@ -331,12 +304,12 @@ export default function Page() {
                     </div>
                   )}
                 </div>
-                {result.alternative !== result.day15 && (
-                  <p className="alternative">
-                    15. den je nepracovní. Varianta s posunem:{" "}
-                    <strong>{display(result.alternative)}</strong>. Zvolený
-                    model: {input.shift ? "s posunem" : "bez posunu"}. Právní
-                    použitelnost posunu ověřte.
+                {result.shifted && (
+                  <p className="deadline-shift">
+                    15. den připadá na víkend nebo svátek. Podle § 607
+                    občanského zákoníku se konec lhůty automaticky posouvá na
+                    nejbližší pracovní den:{" "}
+                    <strong>{display(result.delivery)}</strong>.
                   </p>
                 )}
                 <details className="explanation">
@@ -347,13 +320,13 @@ export default function Page() {
                     ))}
                   </ol>
                   <div className="daystrip">
-                    {Array.from({ length: 16 }, (_, n) => {
+                    {Array.from({ length: result.countedDays }, (_, n) => {
                       const d = plus(input.dayZero, n);
                       const weekend = [0, 6].includes(date(d).getUTCDay());
                       return (
                         <div
                           key={n}
-                          className={`${weekend || holiday(d) ? "offday" : ""} ${n === 0 || n === 15 ? "milestone" : ""}`}
+                          className={`${weekend || holiday(d) ? "offday" : ""} ${n === 0 || n === 15 || n === result.countedDays - 1 ? "milestone" : ""}`}
                           title={`${display(d)}${holiday(d) ? " · " + holiday(d) : weekend ? " · víkend" : ""}`}
                         >
                           <small>{n === 0 ? "Den 0" : n}</small>
@@ -363,8 +336,9 @@ export default function Page() {
                     })}
                   </div>
                   <small>
-                    Víkendy a svátky jsou podbarvené. Započítávají se do 15
-                    kalendářních dnů.
+                    Víkendy a svátky jsou podbarvené. Uvnitř lhůty se
+                    započítávají; nepracovní konec lhůty posouváme až na
+                    nejbližší pracovní den.
                   </small>
                 </details>
                 <details className="explanation">
@@ -427,9 +401,12 @@ export default function Page() {
           <p>
             Model předpokládá nevyzvednutí zásilky a řádné pracovněprávní
             doručování zaměstnavatelem. Pro skutečné převzetí nebo odmítnutí
-            tento model nepoužívejte. Aktuální znění práva a judikatura nebyly
-            online ověřeny. Výpočty nezohledňují individuální okolnosti a
-            ochranné doby.
+            tento model nepoužívejte. Fikce vychází z § 336 zákoníku práce; na
+            konec lhůty se použije § 607 občanského zákoníku prostřednictvím § 4
+            zákoníku práce. Výpovědní doba je odlišná: podle § 333 zákoníku
+            práce se její konec kvůli víkendu ani svátku neposouvá. Výpočty
+            předpokládají zákonný režim, nezohledňují individuální smluvní
+            odchylky a ochranné doby.
           </p>
           <p>
             § 336 — doručování; § 51 — výpovědní doba HPP; § 77 — DPP/DPČ; § 333
@@ -445,11 +422,11 @@ export default function Page() {
             Zákoník práce · MPSV →
           </a>
           <a
-            href="https://e-sbirka.gov.cz/sb/2006/262"
+            href="https://e-sbirka.gov.cz/sb/2012/89"
             target="_blank"
             rel="noreferrer"
           >
-            e-Sbírka →
+            Občanský zákoník · § 605–607 →
           </a>
         </details>
       </main>

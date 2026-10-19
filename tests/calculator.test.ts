@@ -8,7 +8,6 @@ const base: Input = {
   relationship: "HPP",
   termination: "delivery",
   checks: [false, false, false, false, false],
-  custom: false,
   immediateAllowed: false,
   noticeMonths: 2,
 };
@@ -44,10 +43,10 @@ test("Nezastižení, uložení a doložená dostupnost", () =>
   ));
 test("Fikce: den události se nezapočte, vnitřní víkendy se započtou", () =>
   assert.equal(calc({ available: "2026-09-24" }).deadline, "2026-10-09"));
-test("Konec v sobotu je výslovně jen právní varianta", () => {
+test("Konec v sobotu se automaticky posune na pondělí", () => {
   const r = calc({ available: "2026-09-25" });
   assert.equal(r.deadline, "2026-10-12");
-  assert.ok(r.warnings.some((x) => x.includes("§ 607")));
+  assert.ok(r.steps.some((x) => x.includes("§ 607")));
 });
 test("Konec v neděli", () =>
   assert.equal(calc({ available: "2026-09-26" }).deadline, "2026-10-12"));
@@ -128,16 +127,6 @@ for (const relationship of ["DPP", "DPČ"] as const) {
     ),
   );
 }
-test("Odlišná ujednání blokují definitivní konec", () =>
-  assert.equal(
-    calc({
-      relationship: "DPP",
-      termination: "notice",
-      received: "2026-10-01",
-      custom: true,
-    }).end,
-    undefined,
-  ));
 test("Velikonoce a historické zavedení Velkého pátku", () => {
   assert.equal(easter(2026), "2026-04-05");
   assert.equal(holiday("2026-04-03"), "Velký pátek");

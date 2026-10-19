@@ -18,16 +18,14 @@ export type Input = {
   attempt?: string;
   returned?: string;
   checks: boolean[];
-  custom: boolean;
   immediateAllowed: boolean;
   noticeMonths: number;
   laterEnd?: string;
-  storageShift?: "calendar" | "working";
 };
 export function calculate(i: Input) {
   const steps: string[] = [],
     warnings: string[] = [
-      "Aktuální právní znění a judikatura nebyly v tomto prostředí ověřeny. Výsledek není právně ověřený.",
+      "Výpočet předpokládá řádné doručení a splnění zákonných podmínek skončení vztahu; nenahrazuje kontrolu podkladů.",
     ];
   let delivery: string | undefined,
     end: string | undefined,
@@ -70,21 +68,15 @@ export function calculate(i: Input) {
   const confirmed = i.checks.length === 5 && i.checks.every(Boolean);
   if (i.available) {
     const raw = plus(i.available, 15);
-    deadline = i.storageShift === "calendar" ? raw : nextWorking(raw);
+    deadline = nextWorking(raw);
     steps.push(
       `§ 336: rozhodující je doložená možnost vyzvednutí ${i.available}, první počítaný den ${plus(i.available, 1)}. Patnáctý den: ${raw}.`,
     );
     steps.push(
-      off(raw) && i.storageShift !== "calendar"
-        ? `Konec lhůty připadá na nepracovní den (${holiday(raw) || "víkend"}). Varianta se subsidiárním použitím § 607 OZ: ${deadline}. Právní použitelnost posunu musí ověřit odborník.`
-        : i.storageShift === "calendar"
-          ? "Model počítá 15 kalendářních dnů bez posunu konce. Právní použití případného posunu dle § 607 OZ je nutné samostatně ověřit."
-          : "Konec úložní lhůty připadá na pracovní den; posun se neuplatňuje.",
+      off(raw)
+        ? `§ 607 občanského zákoníku: 15. den připadá na ${holiday(raw) || "víkend"}. Poslední den lhůty a fikce doručení se proto posouvají na nejbližší následující pracovní den ${deadline}.`
+        : `§ 607 občanského zákoníku: 15. den ${raw} je pracovní den, konec lhůty se neposouvá.`,
     );
-    if (off(raw))
-      warnings.push(
-        "Konec úložní lhůty v nepracovní den: uvedená fikce je pouze varianta podle § 607 OZ, vyžaduje odborné posouzení.",
-      );
   }
   if (i.received) {
     delivery = i.received;
@@ -120,11 +112,7 @@ export function calculate(i: Input) {
     delivery = undefined;
   }
   if (delivery) {
-    if (i.custom)
-      warnings.push(
-        "Sjednaná odlišná pravidla: konec vztahu musí být posouzen individuálně.",
-      );
-    else if (i.termination === "notice") {
+    if (i.termination === "notice") {
       if (i.relationship !== "HPP") {
         end = plus(delivery, 14);
         steps.push(
